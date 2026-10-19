@@ -1,153 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import {useState} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronLeft, ChevronRight, ExternalLink, Flower2, RefreshCw, Sparkles } from 'lucide-react';
-import './gita.css';
+import {ArrowLeft,ArrowRight,BookOpen,Check,Copy,Heart,LockKeyhole,RefreshCw,Send,Shuffle,Sparkles} from 'lucide-react';
+import {verses,getVerse,type Language,type Verse} from '../../lib/gita';
+import './ask.css';
 
-type Language = 'en' | 'hi';
-type Verse = {
-  id: string;
-  chapter: number;
-  number: number;
-  sanskrit: string[];
-  heading: { en: string; hi: string };
-  meaning: { en: string; hi: string };
-  context: { en: string; hi: string };
-  reflection: { en: string; hi: string };
-  action: { en: string; hi: string };
-  source: string;
+type Tab='heart'|'write';
+type Response={mode:'ai'|'keyword'|'no-match';sensitive:boolean;verse?:{chapter:number;number:number};supporting?:{chapter:number;number:number}|{chapter:number;number:number}[]|null;rationale?:string;note?:string;message?:string};
+const words={
+ en:{back:'Back to UTTAR',eyebrow:'THE BHAGAVAD GITA EXPERIENCE',heading:'Every question deserves a moment of clarity.',intro:'Choose how you would like to discover a teaching. Read the original Sanskrit, its source translation, and a reflection you can carry with you.',heart:'Think your question',write:'Write your question',private:'No need to type or share what is on your mind.',thought:'Hold a question in your heart',thoughtBody:'Pause for a moment. When you feel ready, reveal one randomly selected teaching from the complete Gita.',reveal:'Reveal my verse',another:'Another verse',writeTitle:'What is on your mind?',placeholder:'For example: I am uncertain about changing careers and afraid of making the wrong decision.',find:'Find relevant teaching',analyzing:'Finding passages…',title:'A verse for reflection',suggestion:'A suggested Gita teaching',original:'ORIGINAL SANSKRIT',meaning:'SOURCE TRANSLATION',why:'WHY THIS MAY CONNECT',supporting:'Another passage to explore',source:'Read verse in library',copy:'Copy passage',copied:'Copied',notPrediction:'A verse selected at random does not know your unspoken question and cannot predict what will happen.',modeAi:'AI-assisted matching · from the provided Gita verses',modeKeyword:'Topic/keyword-based matching · AI not enabled',different:'Ask a different question',reflections:'Consider how this teaching might apply to your situation. What is one thoughtful step you could take?',privacy:'Your written question is sent to UTTAR’s server for matching. If AI is enabled, it is also sent to the AI provider. Do not include sensitive personal details.',care:'Scripture can offer perspective, not a guaranteed answer. For urgent safety, health, legal, or financial matters, seek qualified support and use your own judgment.',high:'This topic may need professional or trusted human support. Do not rely on a selected verse alone.',library:'Browse all 700 verses',ram:'Explore Ram Shalaka',error:'We could not check your question. Please try again.',noMatch:'No closely matching verse found. Try another wording, or browse the library.'},
+ hi:{back:'उत्तर पर लौटें',eyebrow:'श्रीमद्भगवद्गीता से चिंतन',heading:'हर प्रश्न को एक शांत क्षण दें।',intro:'मार्ग चुनें और मूल संस्कृत श्लोक, स्रोत का अनुवाद तथा आत्मचिंतन का अवसर पाएँ।',heart:'मन में प्रश्न रखें',write:'प्रश्न लिखें',private:'अपने मन की बात लिखना या साझा करना आवश्यक नहीं।',thought:'मन में एक प्रश्न रखें',thoughtBody:'कुछ क्षण रुकें। तैयार होने पर सम्पूर्ण गीता से एक श्लोक यादृच्छिक रूप से चुनें।',reveal:'एक श्लोक दिखाएँ',another:'दूसरा श्लोक',writeTitle:'आपके मन में क्या है?',placeholder:'उदाहरण: नौकरी बदलने को लेकर उलझन और गलत निर्णय का डर है।',find:'संबंधित शिक्षा खोजें',analyzing:'संबंधित श्लोक खोज रहे हैं…',title:'मनन के लिए एक श्लोक',suggestion:'सुझाया गया गीता श्लोक',original:'मूल संस्कृत',meaning:'स्रोत का अनुवाद',why:'यह कैसे संबंधित हो सकता है',supporting:'एक और संबंधित श्लोक',source:'पुस्तकालय में पढ़ें',copy:'श्लोक कॉपी करें',copied:'कॉपी हो गया',notPrediction:'यादृच्छिक श्लोक आपके मन का अनकहा प्रश्न नहीं जान सकता और भविष्य की भविष्यवाणी नहीं करता।',modeAi:'AI द्वारा चयन · उपलब्ध गीता श्लोकों से',modeKeyword:'विषय/शब्द आधारित सुझाव · AI सक्रिय नहीं',different:'दूसरा प्रश्न पूछें',reflections:'सोचें कि यह शिक्षा आपकी परिस्थिति में कैसे लागू हो सकती है। आज आप कौन सा समझदारी भरा छोटा कदम उठा सकते हैं?',privacy:'आपका लिखा प्रश्न मिलान के लिए UTTAR सर्वर को भेजा जाता है। AI सक्रिय होने पर AI सेवा को भी भेजा जाता है। संवेदनशील निजी जानकारी न लिखें।',care:'ग्रंथ विचार के लिए दृष्टि देते हैं, निश्चित भविष्यफल नहीं। सुरक्षा, स्वास्थ्य, कानून या धन से जुड़े गंभीर मामलों में विशेषज्ञ की सलाह और अपने विवेक का उपयोग करें।',high:'यह विषय विश्वसनीय व्यक्ति या विशेषज्ञ की सहायता माँग सकता है। केवल श्लोक के आधार पर निर्णय न लें।',library:'सभी 700 श्लोक देखें',ram:'राम शलाका देखें',error:'आपका प्रश्न जाँचा नहीं जा सका। दोबारा कोशिश करें।',noMatch:'स्पष्ट रूप से संबंधित श्लोक नहीं मिला। दूसरा प्रश्न लिखें या पुस्तकालय देखें।'},
 };
-
-// Original Sanskrit has been checked against IIT Kanpur's Gita Supersite.
-// All translations, reflections and next steps below are new editorial wording,
-// NOT quotations of another published translation or promises of divination.
-const verses: Verse[] = [
-  {
-    id: '2.47', chapter: 2, number: 47,
-    sanskrit: ['कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।', 'मा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि॥'],
-    heading: { en: 'Focus on what you can do', hi: 'अपने कर्म पर ध्यान दें' },
-    meaning: {
-      en: 'You have a choice in how you act, but you cannot fully control the outcome. Do not act only for a reward, and do not use uncertainty as a reason to stop acting.',
-      hi: 'आपका अधिकार अपने कर्म पर है, उसके परिणाम पर पूरा नियंत्रण नहीं। केवल फल पाने के लिए कर्म न करें और अनिश्चित परिणाम के डर से कर्म करना भी न छोड़ें।',
-    },
-    context: {
-      en: 'Krishna is guiding Arjuna toward responsible action without being consumed by the results.',
-      hi: 'श्रीकृष्ण अर्जुन को परिणाम की चिंता में उलझे बिना अपने कर्तव्य के अनुसार कर्म करने की सीख दे रहे हैं।',
-    },
-    reflection: {
-      en: 'Is worry about the outcome preventing you from doing the right thing today?',
-      hi: 'क्या परिणाम की चिंता आपको आज सही कदम उठाने से रोक रही है?',
-    },
-    action: {
-      en: 'Write down one meaningful action you can take today. Take that step, even if the result is uncertain.',
-      hi: 'आज का एक सार्थक कदम लिखें। परिणाम निश्चित न होने पर भी उस दिशा में आगे बढ़ें।',
-    },
-    source: 'https://www.gitasupersite.iitk.ac.in/dv/bhagavadgita/2.47',
-  },
-  {
-    id: '2.48', chapter: 2, number: 48,
-    sanskrit: ['योगस्थः कुरु कर्माणि सङ्गं त्यक्त्वा धनञ्जय।', 'सिद्ध्यसिद्ध्योः समो भूत्वा समत्वं योग उच्यते॥'],
-    heading: { en: 'Find steadiness in the middle of change', hi: 'सफलता और असफलता में संतुलन' },
-    meaning: {
-      en: 'Act with a steady mind, without clinging to success or fearing failure. Keeping your inner balance through both is a form of yoga.',
-      hi: 'स्थिर मन से कर्म करें। सफलता से अत्यधिक आसक्ति और असफलता के डर से बचें। दोनों स्थितियों में मन का संतुलन बनाए रखना ही योग का एक रूप है।',
-    },
-    context: {
-      en: 'Krishna explains that steadiness of mind matters while acting, whatever the outcome.',
-      hi: 'श्रीकृष्ण समझाते हैं कि कर्म करते समय मन का संतुलन महत्वपूर्ण है, चाहे परिणाम कुछ भी हो।',
-    },
-    reflection: {
-      en: 'How would you approach this situation if you were less afraid of failure?',
-      hi: 'यदि असफलता का डर कम होता, तो आप इस परिस्थिति में क्या अलग करते?',
-    },
-    action: {
-      en: 'Before your next important decision, pause for three calm breaths. Choose your response based on your values, not panic.',
-      hi: 'अगले महत्वपूर्ण निर्णय से पहले तीन गहरी साँसें लें। घबराहट के बजाय अपने मूल्यों के आधार पर कदम चुनें।',
-    },
-    source: 'https://www.gitasupersite.iitk.ac.in/dv/bhagavadgita/2.48',
-  },
-];
-
-export default function GitaPage() {
-  const [language, setLanguage] = useState<Language>('en');
-  const [index, setIndex] = useState(0);
-  const [revealed, setRevealed] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const verse = verses[index];
-  const hindi = language === 'hi';
-
-  function chooseRandom() {
-    const next = verses.length > 1 ? (index + 1 + Math.floor(Math.random() * (verses.length - 1))) % verses.length : 0;
-    setIndex(next);
-    setRevealed(true);
-    setCopied(false);
-  }
-  function browse(delta: number) {
-    setIndex((index + delta + verses.length) % verses.length);
-    setRevealed(true);
-    setCopied(false);
-  }
-  async function copyReflection() {
-    const content = `Bhagavad Gita ${verse.id}\n${verse.sanskrit.join('\n')}\n\n${verse.meaning[language]}\n\n${verse.reflection[language]}\n\nSource: ${verse.source}`;
-    try { await navigator.clipboard.writeText(content); setCopied(true); } catch { setCopied(false); }
-  }
-
-  return (
-    <main className="gita-page">
-      <header className="gita-header">
-        <div className="gita-container gita-header-inner">
-          <Link href="/" className="gita-wordmark" aria-label="UTTAR homepage"><Image src="/lotus.svg" alt="" width={37} height={37}/><span>UTTAR</span></Link>
-          <Link href="/" className="gita-back"><ArrowLeft size={17}/>{hindi ? 'मुख्य पृष्ठ' : 'Back home'}</Link>
-        </div>
-      </header>
-
-      <div className="gita-intro">
-        <div className="gita-container gita-intro-grid">
-          <div>
-            <div className="gita-eyebrow"><Sparkles size={15}/>{hindi ? 'चिंतन का एक शांत क्षण' : 'A QUIET MOMENT TO REFLECT'}</div>
-            <h1>{hindi ? 'भगवद्गीता से' : 'A little clarity,'}<br/><em>{hindi ? 'जीवन की प्रेरणा' : 'a deeper perspective.'}</em></h1>
-            <p>{hindi ? 'मूल संस्कृत श्लोक पढ़ें, सरल अर्थ समझें और अपने अगले कदम पर विचार करें।' : 'Explore a teaching from the Bhagavad Gita, read the original Sanskrit, and find a practical question to carry into your day.'}</p>
-          </div>
-          <div className="gita-art"><Image src="/krishna.webp" alt="Illustration of Shri Krishna playing his flute beside a temple at sunset" fill priority sizes="(max-width: 760px) 100vw, 400px"/></div>
-        </div>
-      </div>
-
-      <div className="gita-container" style={{marginTop:24,marginBottom:8}}><Link href="/gita/library" style={{display:'inline-flex',alignItems:'center',gap:10,background:'#0b2644',color:'#fff',padding:'13px 20px',borderRadius:30,fontWeight:750,fontSize:13}}><BookOpen size={18}/> Explore all 700 verses · 18 chapters <ArrowRight size={16}/></Link></div>
-      <section className="gita-container gita-experience" aria-label="Bhagavad Gita reflection experience">
-        <div className="gita-panel-top">
-          <div><span className="gita-section-label">{hindi ? 'आज का चिंतन' : 'YOUR REFLECTION SPACE'}</span><h2>{hindi ? 'एक श्लोक चुनें' : 'Discover a verse'}</h2></div>
-          <div className="gita-lang" role="group" aria-label="Meaning language"><button type="button" aria-pressed={!hindi} className={!hindi ? 'selected' : ''} onClick={() => setLanguage('en')}>English</button><button type="button" aria-pressed={hindi} className={hindi ? 'selected' : ''} onClick={() => setLanguage('hi')}>हिन्दी</button></div>
-        </div>
-        {!revealed ? (
-          <div className="gita-welcome" key="welcome">
-            <div className="gita-center-symbol"><Flower2 size={37}/></div>
-            <h3>{hindi ? 'मन में एक प्रश्न रखें' : 'Hold a question in your heart'}</h3>
-            <p>{hindi ? 'एक क्षण रुकें। फिर चिंतन के लिए एक श्लोक प्राप्त करें, या उपलब्ध श्लोक स्वयं चुनें।' : 'Take a moment. Then discover a verse for reflection, or browse the available verses yourself.'}</p>
-            <div className="gita-actions"><button className="gita-primary" onClick={chooseRandom}><Sparkles size={17}/>{hindi ? 'एक श्लोक दिखाएँ' : 'Discover a verse'}</button><button className="gita-secondary" onClick={() => {setRevealed(true);setIndex(0)}}><BookOpen size={17}/>{hindi ? 'श्लोक देखें' : 'Browse verses'}</button></div>
-            <small>{hindi ? 'यह परंपरागत भविष्यवाणी नहीं, चिंतन के लिए श्लोक का चयन है।' : 'This is a verse-selection tool for reflection, not a traditional divination method or prediction.'}</small>
-          </div>
-        ) : (
-          <div className="gita-result" key={verse.id}>
-            <div className="gita-verse-meta"><span><BookOpen size={15}/>{hindi ? 'अध्याय' : 'Chapter'} {verse.chapter} · {hindi ? 'श्लोक' : 'Verse'} {verse.number}</span><span className="gita-editorial">{hindi ? 'मूल संस्कृत' : 'ORIGINAL SANSKRIT'}</span></div>
-            <div className="gita-sanskrit" lang="sa-Deva">{verse.sanskrit.map((line) => <p key={line}>{line}</p>)}</div>
-            <div className="gita-gold-divider"><Flower2 size={22}/></div>
-            <h3>{verse.heading[language]}</h3>
-            <div className="gita-meaning"><span className="gita-section-label">{hindi ? 'सरल भावार्थ · UTTAR द्वारा' : 'PLAIN-LANGUAGE MEANING · BY UTTAR'}</span><p>{verse.meaning[language]}</p></div>
-            <div className="gita-insight-grid">
-              <article><span className="gita-section-label">{hindi ? 'प्रसंग' : 'CONTEXT'}</span><p>{verse.context[language]}</p></article>
-              <article><span className="gita-section-label">{hindi ? 'अपने लिए एक प्रश्न' : 'A QUESTION FOR YOU'}</span><p>{verse.reflection[language]}</p></article>
-              <article className="gita-next-step"><span className="gita-section-label">{hindi ? 'आज का छोटा कदम' : 'ONE SMALL STEP'}</span><p>{verse.action[language]}</p></article>
-            </div>
-            <div className="gita-result-actions"><button className="gita-primary" onClick={chooseRandom}><RefreshCw size={16}/>{hindi ? 'दूसरा श्लोक' : 'Another verse'}</button><button className="gita-secondary" onClick={copyReflection}>{copied ? <Check size={16}/> : <BookOpen size={16}/>} {copied ? (hindi ? 'कॉपी किया' : 'Copied') : (hindi ? 'कॉपी करें' : 'Copy reflection')}</button></div>
-            <div className="gita-browser"><button type="button" onClick={() => browse(-1)} aria-label="Previous verse"><ChevronLeft size={18}/></button><span>{hindi ? 'उपलब्ध श्लोक' : 'Curated verses'} · {index + 1} / {verses.length}</span><button type="button" onClick={() => browse(1)} aria-label="Next verse"><ChevronRight size={18}/></button></div>
-            <p className="gita-source">{hindi ? 'मूल पाठ की जाँच:' : 'Sanskrit text checked against:'} <a target="_blank" rel="noopener noreferrer" href={verse.source}>IIT Kanpur Gita Supersite <ExternalLink size={13}/></a></p>
-          </div>
-        )}
-      </section>
-      <div className="gita-container gita-honesty"><Flower2 size={22}/><p>{hindi ? 'यह अनुभव भगवद्गीता के अध्ययन और आत्मचिंतन के लिए है। व्याख्या UTTAR की है, शास्त्र का मूल पाठ नहीं। महत्वपूर्ण चिकित्सा, कानूनी या वित्तीय निर्णय केवल इस चयन के आधार पर न लें।' : 'A space for study and personal reflection. UTTAR’s explanations are modern interpretations, not scripture quotations. A randomly selected verse cannot predict the future or replace professional judgment for important decisions.'}</p></div>
-      <footer className="gita-footer"><div className="gita-container"><span>UTTAR · Ancient Wisdom. Clearer Answers.</span><Link href="/">{hindi ? 'मुख्य पृष्ठ पर लौटें' : 'Return to homepage'} <ArrowRight size={14}/></Link></div></footer>
-    </main>
-  );
+function chooseIndex(length:number,exclude?:number){if(length<=1)return 0;const val=new Uint32Array(1);crypto.getRandomValues(val);let i=val[0]%length;if(i===exclude)i=(i+1)%length;return i;}
+export default function GitaPage(){
+ const [lang,setLang]=useState<Language>('en');const [tab,setTab]=useState<Tab>('heart');const [selected,setSelected]=useState<Verse|null>(null);
+ const [question,setQuestion]=useState('');const [reply,setReply]=useState<Response|null>(null);const [loading,setLoading]=useState(false);const [error,setError]=useState('');const [copied,setCopied]=useState(false);
+ const t=words[lang];
+ function switchTab(next:Tab){setTab(next);setSelected(null);setReply(null);setError('');setCopied(false)}
+ function reveal(){const old=selected?verses.findIndex(v=>v.chapter===selected.chapter&&v.verse===selected.verse):-1;setSelected(verses[chooseIndex(verses.length,old)]);setCopied(false);setError('')}
+ async function submit(e:React.FormEvent){e.preventDefault();if(loading)return;setError('');setReply(null);setSelected(null);setCopied(false);setLoading(true);
+  try{const r=await fetch('/api/gita-guidance',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question:question.trim(),language:lang})});const data=await r.json() as Response&{error?:string};if(!r.ok)throw new Error(data.error||t.error);setReply(data);if(data.verse)setSelected(getVerse(data.verse.chapter,data.verse.number)||null)}catch(e){setError(e instanceof Error?e.message:t.error)}finally{setLoading(false)}
+ }
+ async function copy(){if(!selected)return;try{await navigator.clipboard.writeText(`Bhagavad Gita ${selected.chapter}.${selected.verse}\n${selected.sanskrit}\n\n${selected.translation[lang]}\nhttps://getuttar.com/gita/verse/${selected.chapter}/${selected.verse}`);setCopied(true)}catch{setCopied(false)}}
+ const support=reply?.supporting&&!Array.isArray(reply.supporting)?reply.supporting:null;
+ return <div className="uttar-ask">
+  <header className="ua-nav"><div className="ua-wrap ua-top"><Link href="/" className="ua-logo"><Image src="/lotus.svg" alt="" width={36} height={36}/>UTTAR</Link><div className="ua-nav-actions"><Link href="/" className="ua-home"><ArrowLeft size={16}/><span>{t.back}</span></Link><div className="ua-language" role="group" aria-label="Meaning language"><button type="button" aria-pressed={lang==='en'} className={lang==='en'?'on':''} onClick={()=>setLang('en')}>English</button><button type="button" aria-pressed={lang==='hi'} className={lang==='hi'?'on':''} onClick={()=>setLang('hi')}>हिन्दी</button></div></div></div></header>
+  <section className="ua-hero"><Image src="/krishna.webp" alt="Devotional illustration of Shri Krishna" fill priority sizes="100vw" className="ua-bg"/><div className="ua-wrap ua-hero-content"><div className="ua-kicker"><Sparkles size={15}/>{t.eyebrow}</div><h1>{t.heading}</h1><p>{t.intro}</p></div></section>
+  <main className="ua-wrap ua-main">
+   <div className="ua-modes" role="group" aria-label="Choose guidance mode"><button type="button" onClick={()=>switchTab('heart')} aria-pressed={tab==='heart'} className={tab==='heart'?'chosen':''}><Heart size={23}/><span><strong>{t.heart}</strong><small>{t.private}</small></span></button><button type="button" onClick={()=>switchTab('write')} aria-pressed={tab==='write'} className={tab==='write'?'chosen':''}><Send size={22}/><span><strong>{t.write}</strong><small>{lang==='hi'?'संबंधित गीता शिक्षाएँ खोजें':'Find passages relevant to your words'}</small></span></button></div>
+   <section className="ua-panel" aria-label={tab==='heart'?t.heart:t.write}>
+    {tab==='heart'?<div className="ua-start"><div className="ua-lotus"><Heart size={31}/></div><h2>{t.thought}</h2><p>{t.thoughtBody}</p><button type="button" className="ua-primary" onClick={reveal}><Shuffle size={18}/>{selected?t.another:t.reveal}<ArrowRight size={17}/></button><div className="ua-private"><LockKeyhole size={16}/>{t.private}</div><p className="ua-honesty">{t.notPrediction}</p></div>:<form className="ua-write" onSubmit={submit}><h2>{t.writeTitle}</h2><label htmlFor="ua-question" className="ua-sr-only">{t.writeTitle}</label><textarea id="ua-question" value={question} maxLength={800} minLength={5} onChange={e=>setQuestion(e.target.value)} placeholder={t.placeholder} rows={4} required/><div className="ua-form-foot"><span>{question.length}/800</span><button type="submit" className="ua-primary" disabled={loading||question.trim().length<5}><Sparkles size={17}/>{loading?t.analyzing:t.find}</button></div><p className="ua-privacy"><LockKeyhole size={16}/>{t.privacy}</p></form>}
+    {error&&<p className="ua-error" role="alert">{error}</p>}
+    {tab==='write'&&reply?.mode==='no-match'&&<div className="ua-unmatched" role="status"><p>{reply.message||t.noMatch}</p><Link href="/gita/library">{t.library}<ArrowRight size={16}/></Link></div>}
+    {selected&&<section className="ua-answer" aria-live="polite"><div className="ua-result-header"><span className="ua-kicker"><BookOpen size={16}/>{tab==='heart'?t.title:t.suggestion}</span><span className="ua-ref">{selected.chapter}.{selected.verse}</span></div>{tab==='write'&&reply?.mode!=='no-match'&&<div className="ua-match-type">{reply?.mode==='ai'?t.modeAi:t.modeKeyword}</div>}
+     <div className="ua-sanskrit" lang="sa-Deva">{selected.sanskrit}</div>
+     <div className="ua-divider"><span>✦</span></div><span className="ua-small-label">{t.meaning}</span><p className="ua-translation" lang={lang}>{selected.translation[lang]}</p>
+     {reply?.mode==='ai'&&reply.rationale&&tab==='write'&&<div className="ua-rationale"><span className="ua-small-label">{t.why}</span><p>{reply.rationale}</p></div>}
+     {tab==='write'&&reply?.mode==='keyword'&&<p className="ua-keyword-note">{reply.note||t.modeKeyword}</p>}
+     <div className="ua-reflect"><Heart size={20}/><p>{t.reflections}</p></div>
+     {reply?.sensitive&&<p className="ua-warning">{t.high}</p>}
+     {support&&<Link className="ua-support" href={`/gita/verse/${support.chapter}/${support.number}`}>{t.supporting}: {support.chapter}.{support.number}<ArrowRight size={17}/></Link>}
+     <div className="ua-result-actions"><Link className="ua-primary" href={`/gita/verse/${selected.chapter}/${selected.verse}`}>{t.source}<ArrowRight size={16}/></Link><button className="ua-secondary" type="button" onClick={copy}>{copied?<Check size={16}/>:<Copy size={16}/>} {copied?t.copied:t.copy}</button>{tab==='write'&&<button className="ua-secondary" type="button" onClick={()=>{setReply(null);setSelected(null)}}>{t.different}</button>}</div>
+    </section>}
+   </section>
+   <p className="ua-care">{t.care}</p><div className="ua-links"><Link href="/gita/library"><BookOpen size={19}/>{t.library}<ArrowRight size={16}/></Link><Link href="/ram-shalaka"><Sparkles size={19}/>{t.ram}<ArrowRight size={16}/></Link></div>
+  </main><footer className="ua-footer"><div className="ua-wrap">UTTAR · Ancient Wisdom. Clearer Answers. <span>Scripture translations: Adiyogi Arts (MIT)</span></div></footer>
+ </div>
 }
