@@ -6,6 +6,10 @@ const stop = new Set('the a an is are was were to of in for on or with i me my o
 // Helpful topical tags used ONLY as a local fallback/retrieval stage, not as scripture quotations.
 const topics: {terms:string[];references:string[]}[] = [
  {terms:['dishonest','dishonesty','cheat','fraud','lying','deceit','integrity','ethical','competitor','corruption','बेईमान','धोखा','झूठ','ईमानदारी','भ्रष्टाचार'],references:['16.2','16.1','16.21','17.15','3.21']},
+ {terms:['misleading','fake results','misrepresentation','false report','sales pitch','झूठा दावा','गलत जानकारी'],references:['16.2','16.1','17.15','16.21']},
+ {terms:['caregiver','caring for','elderly parents','exhausted','burnout','देखभाल','बुजुर्ग','थकान'],references:['6.5','12.13','3.19','6.17']},
+ {terms:['lonely','loneliness','alone','isolated','no friends','अकेला','अकेलापन','तनहाई'],references:['12.13','6.5','6.32','6.9']},
+ {terms:['failed startup','startup failed','failure','failed business','शुरुआत असफल','व्यापार में असफल'],references:['2.47','2.48','6.5','18.14']},
  {terms:['career','job','work','profession','business','promotion','office','काम','नौकरी','करियर','व्यापार','रोजगार','कामकाज'],references:['2.47','3.8','3.19','18.45','18.47']},
  {terms:['fear','scared','anxiety','anxious','worried','worry','stress','panic','डर','चिंता','भय','घबराहट','तनाव'],references:['2.14','2.48','6.5','6.26','18.66']},
  {terms:['anger','angry','conflict','fight','resentment','गुस्सा','क्रोध','झगड़ा','क्लेश'],references:['2.62','2.63','16.21','12.13']},
