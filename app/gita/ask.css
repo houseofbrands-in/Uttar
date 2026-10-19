@@ -17,3 +17,8 @@
 /* v2.2: visibly separate source-grounded teaching from editorial application. */
 .ua-source-teaching{border:1px solid #d8d0bb;background:#f4f2e9;border-radius:12px;padding:20px 22px}
 .ua-source-teaching p{line-height:1.78;font-size:14px;color:#364459;margin:9px 0 0}
+
+/* v2.3: transparently distinguish direct teaching from broad analogy. */
+.ua-relevance{padding:14px 18px;border:1px solid #dcc9a9;background:#fff8ed;border-radius:12px;color:#544530}
+.ua-relevance strong{font-size:12px;letter-spacing:.3px}
+.ua-relevance p{margin:7px 0 0;line-height:1.65;font-size:13px;color:#50575e}

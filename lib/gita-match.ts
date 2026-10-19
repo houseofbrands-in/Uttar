@@ -5,6 +5,7 @@ const stop = new Set('the a an is are was were to of in for on or with i me my o
 
 // Helpful topical tags used ONLY as a local fallback/retrieval stage, not as scripture quotations.
 const topics: {terms:string[];references:string[]}[] = [
+ {terms:['dishonest','dishonesty','cheat','fraud','lying','deceit','integrity','ethical','competitor','corruption','बेईमान','धोखा','झूठ','ईमानदारी','भ्रष्टाचार'],references:['16.2','16.1','16.21','17.15','3.21']},
  {terms:['career','job','work','profession','business','promotion','office','काम','नौकरी','करियर','व्यापार','रोजगार','कामकाज'],references:['2.47','3.8','3.19','18.45','18.47']},
  {terms:['fear','scared','anxiety','anxious','worried','worry','stress','panic','डर','चिंता','भय','घबराहट','तनाव'],references:['2.14','2.48','6.5','6.26','18.66']},
  {terms:['anger','angry','conflict','fight','resentment','गुस्सा','क्रोध','झगड़ा','क्लेश'],references:['2.62','2.63','16.21','12.13']},
@@ -24,7 +25,7 @@ export type Match={verse:Verse;score:number;reasons:string[]};
 export function findCandidateVerses(question:string, verses:Verse[], limit=12):Match[]{
  const tokens=terms(question);const lower=question.toLocaleLowerCase();
  const weights=new Map<string,number>();
- for(const topic of topics)if(topic.terms.some(t=>t.includes(' ')?lower.includes(t):terms(lower).includes(t))){for(const ref of topic.references)weights.set(ref,(weights.get(ref)||0)+14)}
+ for(const topic of topics)if(topic.terms.some(t=>t.includes(' ')?lower.includes(t):tokens.some(w=>w===t||w.startsWith(t)&&w.length-t.length<=4))){for(const ref of topic.references)weights.set(ref,(weights.get(ref)||0)+14)}
  return verses.map(v=>{
   const ref=`${v.chapter}.${v.verse}`;
   const en=v.translation.en.toLocaleLowerCase();const hi=v.translation.hi.toLocaleLowerCase();
