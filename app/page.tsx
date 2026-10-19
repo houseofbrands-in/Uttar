@@ -41,7 +41,7 @@ export default function Home() {
           <article className="path-card ram">
             <Image src="/rama.webp" alt="Illustration of Shri Rama carrying a bow beside a temple at golden sunset" fill sizes="(max-width: 760px) 100vw, 50vw" className="card-image" />
             <div className="card-shade" aria-hidden="true" />
-            <div className="path-content"><span className="card-label">THE PATH OF DEVOTION</span><h3>Ramcharitmanas</h3><p>Guidance through devotion, values and righteous living.</p><div className="tag-row"><span>Traditional Ram Shalaka</span><span>Meaning &amp; context</span></div><span className="card-button">Explore Ramcharitmanas <ArrowRight size={18}/></span><small>Experience coming soon</small></div>
+            <div className="path-content"><span className="card-label">THE PATH OF DEVOTION</span><h3>Ramcharitmanas</h3><p>Guidance through devotion, values and righteous living.</p><div className="tag-row"><span>Traditional Ram Shalaka</span><span>Meaning &amp; context</span></div><a className="card-button" href="/ram-shalaka">Explore Ram Shalaka <ArrowRight size={18}/></a></div>
           </article>
         </div>
       </section>

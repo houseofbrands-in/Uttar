@@ -1,23 +1,30 @@
-# UTTAR — Bhagavad Gita Experience v1
+# UTTAR — Ram Shalaka Release
 
-## What changed
-- New `/gita` interactive experience with Sanskrit original text and English/हिन्दी meaning toggle.
-- Discover a verse for reflection or browse the currently curated verses.
-- Reading includes context, a reflection question, one practical next step, source link and copy button.
-- Existing homepage imagery and layout preserved; Bhagavad Gita card now links to `/gita`.
-- Ramcharitmanas remains intentionally labeled as coming soon.
+Next.js App Router project for UTTAR. This package preserves the existing homepage and `/gita` experience and adds `/ram-shalaka`.
 
-## Sources & editorial integrity
-- Original Sanskrit for **Bhagavad Gita 2.47** and **2.48** checked against IIT Kanpur's Gita Supersite.
-- Source links accompany each result. Simple English/Hindi meanings and reflections are original UTTAR editorial content, not attributed to any traditional commentator.
-- This first release contains **2 curated verses only**, not all 700. Random selection is explicitly framed as reflection rather than traditional divination, guaranteed advice or a prediction.
+## Install / run
 
-## Run locally
-```
+```sh
 npm install
 npm run dev
 ```
-Open `http://localhost:3000/gita`.
+
+## Features
+
+- `app/ram-shalaka`: fully interactive 15×15 Shri Ram Shalaka grid (225 aksharas), every-ninth-cell trace, nine traditional results, Hindi/English switch, original text + full source chaupai, context, a reflection question, next step, copy and reset.
+- `app/gita`: original Gita feature retained.
+- `app/page.tsx`: both scripture cards now navigate to the functional pages.
+- No database or API key required.
+
+## Sources / editorial notes
+
+- Grid transcription: https://vedprashnavali.com/hi/prash
+- Grid and modulo-9 mapping cross-check: https://kundlipoint.com/ram-shalaka and https://shriramshalaka.com/prashnavali-chart
+- 8 complete source chaupais behind the nine Shalaka lines: https://shriramshalaka.com/chaupaiyan
+- Note: grid letter spelling and segmentation vary slightly by published recension. The line output is presented in a normalized readable form; we do not render the raw concatenation of grid cells as exact canonical scripture.
+- English / Hindi interpretation, questions and next steps are editorial content written for UTTAR, not scripture translations or predictions.
+- The selection is deterministic: cell index `% 9` selects one of nine lines; `traceSelection()` confirms the 25 positions every 9 steps in the 225-cell grid.
 
 ## Deployment
-Upload the contents of this folder to the root of your existing `houseofbrands-in/Uttar` repository, replacing duplicate files, while keeping the `app` and `public` folders intact. Vercel should redeploy after a commit. No new environment variables or database necessary.
+
+Unzip and copy all files to repository root (preserving folder structure). Commit and push; Vercel can build this as a normal Next.js app. The website route is `/ram-shalaka`.
