@@ -31,12 +31,12 @@ export default function Home() {
         <div><Heart size={26}/><strong>Reflect at your pace</strong><span>Free to explore</span></div>
       </section>
       <section className="path-section wrap" id="paths">
-        <div className="section-heading"><span className="section-kicker">TWO SACRED PATHS · ONE PURPOSE</span><h2>Choose your path</h2><p>Explore the teachings that speak to you. Interactive scripture experiences are coming soon.</p></div>
+        <div className="section-heading"><span className="section-kicker">TWO SACRED PATHS · ONE PURPOSE</span><h2>Choose your path</h2><p>Explore the teachings that speak to you. Begin with the Bhagavad Gita reflection experience. Ram Shalaka is coming soon.</p></div>
         <div className="path-grid">
           <article className="path-card gita">
             <Image src="/krishna.webp" alt="Illustration of Shri Krishna with his flute beside a temple at sunset" fill sizes="(max-width: 760px) 100vw, 50vw" className="card-image" />
             <div className="card-shade" aria-hidden="true" />
-            <div className="path-content"><span className="card-label">THE PATH OF INSIGHT</span><h3>Bhagavad Gita</h3><p>Wisdom for life's choices, inner courage and a calmer mind.</p><div className="tag-row"><span>18 chapters</span><span>Verse reflections</span></div><span className="card-button">Explore Gita <ArrowRight size={18}/></span><small>Experience coming soon</small></div>
+            <div className="path-content"><span className="card-label">THE PATH OF INSIGHT</span><h3>Bhagavad Gita</h3><p>Wisdom for life's choices, inner courage and a calmer mind.</p><div className="tag-row"><span>18 chapters</span><span>Verse reflections</span></div><a href="/gita" className="card-button">Explore Gita <ArrowRight size={18}/></a><small>Read verified Sanskrit and explore a reflection</small></div>
           </article>
           <article className="path-card ram">
             <Image src="/rama.webp" alt="Illustration of Shri Rama carrying a bow beside a temple at golden sunset" fill sizes="(max-width: 760px) 100vw, 50vw" className="card-image" />

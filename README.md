@@ -1,22 +1,23 @@
-# UTTAR · Homepage v2
+# UTTAR — Bhagavad Gita Experience v1
 
-**Ancient Wisdom. Clearer Answers.**
+## What changed
+- New `/gita` interactive experience with Sanskrit original text and English/हिन्दी meaning toggle.
+- Discover a verse for reflection or browse the currently curated verses.
+- Reading includes context, a reflection question, one practical next step, source link and copy button.
+- Existing homepage imagery and layout preserved; Bhagavad Gita card now links to `/gita`.
+- Ramcharitmanas remains intentionally labeled as coming soon.
 
-Next.js App Router website featuring commissioned original UTTAR illustrations. Scripture features are not implemented in this homepage-only release.
+## Sources & editorial integrity
+- Original Sanskrit for **Bhagavad Gita 2.47** and **2.48** checked against IIT Kanpur's Gita Supersite.
+- Source links accompany each result. Simple English/Hindi meanings and reflections are original UTTAR editorial content, not attributed to any traditional commentator.
+- This first release contains **2 curated verses only**, not all 700. Random selection is explicitly framed as reflection rather than traditional divination, guaranteed advice or a prediction.
 
-## Local preview
-
-```bash
+## Run locally
+```
 npm install
 npm run dev
 ```
+Open `http://localhost:3000/gita`.
 
-## Deploy
-
-Upload the **contents** of this folder to the root of `houseofbrands-in/Uttar` on GitHub, replacing matching files. Vercel will redeploy automatically when connected to the `main` branch.
-
-Updated files: `app/page.tsx`, `app/globals.css`, `README.md`. New files: `public/hero-valley.webp`, `public/krishna.webp`, `public/rama.webp`, `public/lotus-lake.webp`.
-
-## Notes
-
-The Gita and Ramcharitmanas cards are **coming-soon previews**, not active guidance functionality. Scripture texts and selection methods must be verified before launch. Artwork is illustrative, not a representation of a particular scripture verse.
+## Deployment
+Upload the contents of this folder to the root of your existing `houseofbrands-in/Uttar` repository, replacing duplicate files, while keeping the `app` and `public` folders intact. Vercel should redeploy after a commit. No new environment variables or database necessary.
