@@ -10,6 +10,9 @@ const topics: {terms:string[];references:string[]}[] = [
  {terms:['anger','angry','conflict','fight','resentment','गुस्सा','क्रोध','झगड़ा','क्लेश'],references:['2.62','2.63','16.21','12.13']},
  {terms:['decision','confused','confusion','choice','uncertain','doubt','decide','निर्णय','उलझन','दुविधा','फैसला','समझ'],references:['2.47','2.50','4.34','18.63']},
  {terms:['relationship','partner','marriage','family','friend','love','betrayal','रिश्ता','शादी','परिवार','प्रेम','दोस्ती','संबंध'],references:['12.13','12.14','6.9','16.2']},
+ {terms:['married','spouse','wife','husband','affair','commitment','vows','divorce','विवाहित','पत्नी','पति','विवाह','प्रतिबद्धता'],references:['3.19','16.2','17.15','18.63','12.13']},
+ {terms:['dishonest','cheating','fraud','integrity','ethical','competitor','deceit','ईमानदारी','बेईमानी','धोखा','नैतिक'],references:['16.1','16.2','16.21','17.15','3.19']},
+ {terms:['family duty','responsibility','sacrifice','boundaries','expectations','dreams','जिम्मेदारी','त्याग','उम्मीद','सपने'],references:['3.19','6.5','12.13','18.63','18.47']},
  {terms:['failure','success','result','achievement','exam','study','school','परीक्षा','सफलता','असफलता','नतीजा','पढ़ाई'],references:['2.47','2.48','6.5','18.14']},
  {terms:['loss','grief','death','sad','sadness','suffering','heartbreak','शोक','दुख','मृत्यु','हानि','नुकसान','उदासी'],references:['2.11','2.13','2.22','2.27']},
  {terms:['peace','calm','meditate','focus','mind','sleep','शांति','मन','ध्यान','एकाग्रता'],references:['6.19','6.26','2.66','6.35']},
@@ -21,7 +24,7 @@ export type Match={verse:Verse;score:number;reasons:string[]};
 export function findCandidateVerses(question:string, verses:Verse[], limit=12):Match[]{
  const tokens=terms(question);const lower=question.toLocaleLowerCase();
  const weights=new Map<string,number>();
- for(const topic of topics)if(topic.terms.some(t=>lower.includes(t))){for(const ref of topic.references)weights.set(ref,(weights.get(ref)||0)+14)}
+ for(const topic of topics)if(topic.terms.some(t=>t.includes(' ')?lower.includes(t):terms(lower).includes(t))){for(const ref of topic.references)weights.set(ref,(weights.get(ref)||0)+14)}
  return verses.map(v=>{
   const ref=`${v.chapter}.${v.verse}`;
   const en=v.translation.en.toLocaleLowerCase();const hi=v.translation.hi.toLocaleLowerCase();

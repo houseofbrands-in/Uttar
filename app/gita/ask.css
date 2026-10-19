@@ -13,3 +13,7 @@
 
 /* UTTAR Guidance Engine v2.1 */
 .ua-takeaway{margin-top:24px;padding:22px 24px;border-radius:14px;background:#eaf0e7;border:1px solid #bfd0b7;border-left:4px solid #5c8265}.ua-takeaway .ua-small-label{color:#3e6748}.ua-takeaway p{font-weight:650;color:#173d31;line-height:1.7;font-size:16px;margin:10px 0 0}.ua-optional-reflection{margin-top:18px}.ua-reflection-toggle{display:inline-flex;gap:9px;align-items:center;background:transparent;border:1px solid #ddccb5;border-radius:30px;color:#765329;padding:11px 16px;font-weight:700;font-size:13px;cursor:pointer}.ua-optional-reflection .ua-tailored-reflection{margin-top:12px}.ua-reflection-toggle:focus-visible{outline:3px solid #438dc1;outline-offset:3px}
+
+/* v2.2: visibly separate source-grounded teaching from editorial application. */
+.ua-source-teaching{border:1px solid #d8d0bb;background:#f4f2e9;border-radius:12px;padding:20px 22px}
+.ua-source-teaching p{line-height:1.78;font-size:14px;color:#364459;margin:9px 0 0}
