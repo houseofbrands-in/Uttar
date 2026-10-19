@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 import { ArrowLeft, ArrowRight, BookOpen, Check, ChevronDown, Copy, Flower2, Heart, RotateCcw, Sparkles } from 'lucide-react';
-import { answers, cells, resultForSelection, traceSelection, type Language } from './data';
+import { cells, resultForSelection, traceSelection, type Language } from './data';
 import './shalaka.css';
 
 const ui = {
@@ -12,8 +12,9 @@ const ui = {
     back: 'Back to UTTAR', kicker: 'THE RAMCHARITMANAS PATH', title: 'Shri Ram Shalaka',
     subtitle: 'An ancient devotional practice, thoughtfully experienced today.',
     introduction: 'Hold a question in your heart. Remember Shri Ram. Then select one akshara from the sacred grid.',
-    label: '15 × 15 traditional akshara grid', instructions: 'Tap any letter to reveal a chaupai',
+    label: '15 × 15 akshara grid · from the supplied printed edition', instructions: 'Tap any letter to reveal a chaupai',
     gridHint: 'Choose by intuition. The traditional method reads every ninth position from your selection.',
+    traditional: 'Traditional result (फल) · as printed in the book', sourceNote: 'Gita Press edition · PDF page', editorial: 'UTTAR’s modern reflection (not a scriptural quotation)', gridVariants: 'In this edition, a few grid sequences differ in lettering from their printed answer lines; UTTAR displays the chaupai as printed in the answer section.',
     passage: 'Your Shalaka passage', source: 'Shri Ramcharitmanas', context: 'Scripture context',
     meaning: 'Meaning & gentle guidance', reflection: 'A question to reflect on', step: 'A small next step',
     full: 'Read full source chaupai', hide: 'Hide full chaupai', again: 'Ask another question',
@@ -26,8 +27,9 @@ const ui = {
     back: 'उत्तर होमपेज', kicker: 'रामचरितमानस का पथ', title: 'श्री राम शलाका',
     subtitle: 'प्राचीन भक्तिपरक परंपरा का आधुनिक, सरल अनुभव।',
     introduction: 'अपने मन में प्रश्न रखें, श्रीराम का स्मरण करें और नीचे दी गई शलाका में एक अक्षर चुनें।',
-    label: 'पारंपरिक १५ × १५ अक्षर-चक्र', instructions: 'किसी अक्षर को स्पर्श करें',
+    label: 'दिए गए मुद्रित संस्करण का १५ × १५ अक्षर-चक्र', instructions: 'किसी अक्षर को स्पर्श करें',
     gridHint: 'अपनी सहज भावना से चुनें। परंपरा में चुने हुए स्थान से हर नौवें खाने की गणना होती है।',
+    traditional: 'पुस्तक में दिया पारंपरिक फल', sourceNote: 'गीताप्रेस संस्करण · PDF पृष्ठ', editorial: 'UTTAR का आधुनिक चिंतन (मूल शास्त्र नहीं)', gridVariants: 'इस संस्करण में कुछ अक्षर-क्रमों की वर्तनी छपे हुए उत्तर से थोड़ी अलग है। UTTAR उत्तर-पृष्ठ में छपी चौपाई को दिखाता है।',
     passage: 'आपको मिली चौपाई', source: 'श्रीरामचरितमानस', context: 'मूल प्रसंग',
     meaning: 'सरल अर्थ और मार्गदर्शन', reflection: 'मनन के लिए एक प्रश्न', step: 'अगला छोटा कदम',
     full: 'पूरी मूल चौपाई पढ़ें', hide: 'पूरी चौपाई छिपाएँ', again: 'फिर प्रश्न करें',
@@ -102,9 +104,11 @@ export default function RamShalakaPage() {
         {answer && <section className="shalaka-result" id="shalaka-result" aria-live="polite" key={answer.id}>
           <div className="shalaka-result-heading"><span className="shalaka-overline"><Flower2 size={17}/>{t.passage}</span><span className="shalaka-kanda">{answer.kanda}</span></div>
           <h2 lang="hi" className="shalaka-chaupai">{answer.line}</h2>
-          <p className="shalaka-reference">{t.source} · {answer.kanda} · {lang === 'hi' ? 'पारंपरिक शलाका उत्तर' : 'Traditional Shalaka answer'} {answer.id}/9</p>
+          <p className="shalaka-reference">{t.source} · {answer.kanda} · {t.sourceNote} {answer.sourcePage} · {lang === 'hi' ? 'उत्तर' : 'Answer'} {answer.id}/9</p>
+          <article className="shalaka-traditional"><strong>{t.traditional}</strong><p>{answer.traditionalFruit[lang]}</p></article>
           <button type="button" className="shalaka-full-toggle" onClick={() => setShowFull(!showFull)} aria-expanded={showFull}>{showFull ? t.hide : t.full}<ChevronDown className={showFull ? 'flip' : ''} size={17}/></button>
           {showFull && <p className="shalaka-full-text" lang="hi">{answer.full}</p>}
+          <p className="shalaka-editorial">{t.editorial}</p>
           <div className="shalaka-result-details">
             <article><span className="shalaka-detail-label"><BookOpen size={18}/>{t.context}</span><p>{answer.context[lang]}</p></article>
             <article><span className="shalaka-detail-label"><Sparkles size={18}/>{t.meaning}</span><p>{answer.meaning[lang]}</p></article>
@@ -115,6 +119,7 @@ export default function RamShalakaPage() {
         </section>}
         <div className="shalaka-method"><button type="button" onClick={() => setShowMethod(!showMethod)} aria-expanded={showMethod}><span><BookOpen size={19}/>{t.about}</span><ChevronDown className={showMethod ? 'flip' : ''} size={20}/></button>{showMethod && <p>{t.method}</p>}</div>
         <div className="shalaka-care"><Heart size={18}/><p>{t.note}</p></div>
+        <p className="shalaka-source-variance">{t.gridVariants}</p>
         <div className="shalaka-explore"><Link href="/gita">{t.browse}<ArrowRight size={16}/></Link></div>
       </section>
     </main>
