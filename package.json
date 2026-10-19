@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
-    "verify:shalaka": "node scripts/verify-shalaka.mjs"
+    "verify:shalaka": "node scripts/verify-shalaka.mjs",
+    "prebuild": "node scripts/sync-gita.mjs",
+    "predev": "node scripts/sync-gita.mjs",
+    "verify:gita": "node scripts/verify-gita.mjs"
   },
   "dependencies": {
     "next": "^15.5.0",

@@ -4,3 +4,6 @@ node_modules
 !.env.example
 .DS_Store
 *.tsbuildinfo
+
+# Retrieved and validated at build time; don't commit third-party corpus.
+/data/gita-corpus.json

@@ -114,6 +114,7 @@ export default function GitaPage() {
         </div>
       </div>
 
+      <div className="gita-container" style={{marginTop:24,marginBottom:8}}><Link href="/gita/library" style={{display:'inline-flex',alignItems:'center',gap:10,background:'#0b2644',color:'#fff',padding:'13px 20px',borderRadius:30,fontWeight:750,fontSize:13}}><BookOpen size={18}/> Explore all 700 verses · 18 chapters <ArrowRight size={16}/></Link></div>
       <section className="gita-container gita-experience" aria-label="Bhagavad Gita reflection experience">
         <div className="gita-panel-top">
           <div><span className="gita-section-label">{hindi ? 'आज का चिंतन' : 'YOUR REFLECTION SPACE'}</span><h2>{hindi ? 'एक श्लोक चुनें' : 'Discover a verse'}</h2></div>
