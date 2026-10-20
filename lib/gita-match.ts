@@ -26,6 +26,34 @@ const topics: {terms:string[];references:string[]}[] = [
 ];
 function terms(text:string):string[]{return (text.toLocaleLowerCase().match(/[\p{L}\p{N}]+/gu)||[]).filter(x=>x.length>=3&&!stop.has(x)).slice(0,70)}
 export type Match={verse:Verse;score:number;reasons:string[]};
+// Conservative, transparent Roman-Hindi signal detection. An explicit Hinglish selection
+// always wins; automatic detection requires multiple distinctive terms to avoid false positives.
+const romanHindiSignals = new Set(`mujhe muje mera meri mere main mai mein kya kaise kyun kyu nahi nai nahin samajh samjh hoon hun hu hai hain karu karun karna chahiye pata lagta lagti pareshaan pareshan gussa darr dar dhokha dosti rishta ghar naukri paisa paise shaadi shadi pyar pyaar zindagi zindgi thak gaya gayi soch raha rahi chhod chod jhoot jhuth sach`.split(' '));
+export function detectHinglish(question:string):boolean {
+ const tokens = question.toLocaleLowerCase().match(/[a-z]+/g)||[];
+ const hits=tokens.filter(t=>romanHindiSignals.has(t));
+ const distinctive=hits.filter(t=>!['hai','hain','main','mai','mein','hu','hun','hoon','kya','nahi','nai'].includes(t));
+ return hits.length>=2 && distinctive.length>=1;
+}
+// Expand English meaning for known Roman-Hindi concepts before verse retrieval.
+// Preserve the original question separately for safety screening and the AI model.
+const romanConcepts:[RegExp,string][]=[
+ [/\b(darr|dar|ghabrahat|tension|chinta|pareshan|pareshaan|fikr)\b/gi,' fear anxiety stress worry डर चिंता'],
+ [/\b(gussa|gusse|naraz|ladai|jhagda|jhagda)\b/gi,' anger conflict fight गुस्सा झगड़ा'],
+ [/\b(dhokha|bewafai|jhoot|jhuth|cheating|bharosa)\b/gi,' betrayal dishonest trust friend धोखा झूठ दोस्ती'],
+ [/\b(naukri|job|kaam|career|business|vyapar|dhandha)\b/gi,' career job business काम नौकरी'],
+ [/\b(paisa|paise|karz|karza|kamai|salary)\b/gi,' money debt income पैसा कर्ज'],
+ [/\b(shaadi|shadi|rishta|rishte|family|ghar|pati|patni|pyar|pyaar)\b/gi,' marriage relationship family रिश्ता परिवार'],
+ [/\b(dukh|udaas|akela|akelapan|tanha|roona|rona)\b/gi,' sadness loneliness grief दुख अकेलापन'],
+ [/\b(faisla|decision|confuse|samajh|samjh|uljhan|dilemma)\b/gi,' decision confusion uncertain फैसला दुविधा'],
+ [/\b(imtihan|exam|padhai|fail|failure|success)\b/gi,' exam failure success study परीक्षा'],
+ [/\b(shanti|sukoon|dhyan|mind|neend)\b/gi,' peace calm meditate sleep शांति ध्यान'],
+];
+export function getRomanHindiSearchText(question:string):string {
+ let extra='';for(const [re,meaning] of romanConcepts){re.lastIndex=0;if(re.test(question))extra+=meaning+' ';}
+ return extra ? question+' '+extra : question;
+}
+
 export function findCandidateVerses(question:string, verses:Verse[], limit=12):Match[]{
  const tokens=terms(question);const lower=question.toLocaleLowerCase();
  const weights=new Map<string,number>();

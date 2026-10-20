@@ -1,14 +1,25 @@
 export type SafetyKind = 'crisis' | 'danger';
-export type Language = 'en' | 'hi';
+export type Language = 'en' | 'hi' | 'hinglish';
 // Safety paths intentionally precede retrieval/AI, and never return scripture.
 // Explicit crisis and threat patterns: conservative high-recall examples, not a clinical classifier.
 export function detectSafety(question: string): SafetyKind | null {
   const q = question.toLocaleLowerCase().normalize('NFKC');
-  if (/\b(suicid(?:e|al)?|self[- ]?harm|kill myself|end my life|take my (?:own )?life|want to die|wish i were dead|hurt myself|ending my life|thinking of dying)\b|आत्महत्या|खुदकुशी|खुद को मार|जान देना|मरना चाहता|मरना चाहती|जीना नहीं चाहता|जीना नहीं चाहती|apni jaan (?:lena|dena)|khudkushi|suicide kar/i.test(q)) return 'crisis';
-  if (/\b(someone (?:at home |in my (?:house|family) )?(?:is )?(?:threaten(?:ing|s)?|hurt(?:ing|s)?|abus(?:ing|es)|hit(?:ting|s)?|beat(?:ing|s)?|attack(?:ing|s)?|violent)|(?:my )?(?:partner|spouse|husband|wife|family member|parent) (?:is )?(?:threaten(?:ing|s)?|abus(?:ing|es)|hit(?:ting|s)?|beat(?:ing|s)?|violent)|domestic (?:violence|abuse)|unsafe at home|afraid (?:to go |of being )?home|being threatened|is threatening me|threats at home)\b|घरेलू हिंसा|घर में धमक|मुझे धमकी|मारपीट|घर में असुरक्षित|घर पर डर|jaan se marne ki dhamki|ghar mein hinsa/i.test(q)) return 'danger';
+  if (/\b(suicid(?:e|al)?|self[- ]?harm|kill myself|end my life|take my (?:own )?life|want to die|wish i were dead|hurt myself|ending my life|thinking of dying)\b|आत्महत्या|खुदकुशी|खुद को मार|जान देना|मरना चाहता|मरना चाहती|जीना नहीं चाहता|जीना नहीं चाहती|apni jaan (?:lena|dena)|khudkushi|suicide kar|marna chahta|marna chahti|jeena nahi chahta|jeena nahi chahti|zinda nahi rehna|khud ko marna|apni jaan deni|khud ko nuksan pahunchana/i.test(q)) return 'crisis';
+  if (/\b(someone (?:at home |in my (?:house|family) )?(?:is )?(?:threaten(?:ing|s)?|hurt(?:ing|s)?|abus(?:ing|es)|hit(?:ting|s)?|beat(?:ing|s)?|attack(?:ing|s)?|violent)|(?:my )?(?:partner|spouse|husband|wife|family member|parent) (?:is )?(?:threaten(?:ing|s)?|abus(?:ing|es)|hit(?:ting|s)?|beat(?:ing|s)?|violent)|domestic (?:violence|abuse)|unsafe at home|afraid (?:to go |of being )?home|being threatened|is threatening me|threats at home)\b|घरेलू हिंसा|घर में धमक|मुझे धमकी|मारपीट|घर में असुरक्षित|घर पर डर|jaan se marne ki dhamki|ghar mein hinsa|ghar me hinsa|ghar mein maarpeet|ghar me maarpeet|pati marta hai|husband marta hai|mujhe maarta hai|mujhe marta hai|dhamki deta hai|dhamki deti hai|ghar mein unsafe|ghar me unsafe/i.test(q)) return 'danger';
   return null;
 }
 export function safetyResponse(kind: SafetyKind, lang: Language) {
+  if (lang === 'hinglish') return kind === 'crisis'
+    ? { mode:'safety' as const, safetyKind:kind, sensitive:true,
+        title:'Aapki safety sabse zaroori hai',
+        message:'Agar aap khud ko nuksan pahunchane ya apni jaan lene ke baare mein soch rahe hain, toh abhi akele mat rahiye. Gita ki reflection emergency help ka replacement nahi hai.',
+        steps:['Abhi kisi bharosemand insaan ko batayein aur unse saath rehne ko kahein.','Khud ko chot pahunchane wali cheezon se door ho jaayein.','Agar turant khatra hai, local emergency number par call karein ya nearest emergency department jaayein.'],
+        footer:'Local crisis helpline ya mental-health professional ki madad bhi lein.' }
+    : { mode:'safety' as const, safetyKind:kind, sensitive:true,
+        title:'Dhamki ya hinsa sehna aapka farz nahi hai',
+        message:'Aapki safety sabse pehle hai. Kisi dharmik teaching ka matlab yeh nahi ki aapko hinsa ya dhamki sehni hogi.',
+        steps:['Agar mumkin ho toh safe jagah jaayein aur kisi trusted person ko batayein.','Turant khatre mein local emergency services ko contact karein.','Akele confront na karein agar isse khatra badh sakta hai.'],
+        footer:'Local domestic-violence support service ya qualified professional safer next steps plan karne mein madad kar sakte hain.' };
   if (lang === 'hi') return kind === 'crisis'
     ? { mode:'safety' as const, safetyKind:kind, sensitive:true,
         title:'आपकी सुरक्षा सबसे ज़रूरी है',
