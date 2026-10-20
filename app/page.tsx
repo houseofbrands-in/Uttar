@@ -9,7 +9,7 @@ export default function Home() {
   return <>
     <header className="site-header wrap">
       <Logo />
-      <nav aria-label="Main navigation"><a href="#paths">Explore</a><a href="#how">How it works</a><a href="#about">Our approach</a></nav>
+      <nav aria-label="Main navigation"><a href="#paths">Explore</a><a href="#how">How it works</a><a href="#about">Our approach</a><a href="/guidance">Life questions</a></nav>
       <a className="header-cta" href="#paths">Get started <ArrowRight size={17} /></a>
     </header>
     <main>

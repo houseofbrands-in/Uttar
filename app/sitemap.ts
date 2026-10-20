@@ -4,7 +4,7 @@ import { verses } from '../lib/gita';
 const baseUrl = 'https://getuttar.com';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const pages = ['/', '/gita', '/gita/library', '/ram-shalaka'];
+  const pages = ['/', '/gita', '/gita/library', '/ram-shalaka', '/guidance', '/guidance/bhagavad-gita-for-anxiety', '/guidance/bhagavad-gita-for-stress', '/guidance/bhagavad-gita-for-money-problems', '/guidance/bhagavad-gita-for-career-confusion', '/guidance/bhagavad-gita-for-anger'];
   return [
     ...pages.map((path) => ({
       url: `${baseUrl}${path}`,
