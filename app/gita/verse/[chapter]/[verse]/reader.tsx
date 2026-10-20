@@ -1,6 +1,6 @@
 'use client';
 
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {ArrowLeft,ArrowRight,BookOpen,Check,Copy,ExternalLink,Flower2,Shuffle} from 'lucide-react';
@@ -9,6 +9,7 @@ import '../../../library/library.css';
 
 export default function VerseReader({verse,chapterCount}:{verse:Verse;chapterCount:number}){
  const [language,setLanguage]=useState<Language>('en');const [copied,setCopied]=useState(false);const hi=language==='hi';
+ useEffect(()=>{if(new URLSearchParams(window.location.search).get('lang')==='hi')setLanguage('hi')},[]);
  const previous=verse.verse>1?{chapter:verse.chapter,verse:verse.verse-1}:verse.chapter>1?{chapter:verse.chapter-1,verse:verses.filter(v=>v.chapter===verse.chapter-1).length}:null;
  const next=verse.verse<chapterCount?{chapter:verse.chapter,verse:verse.verse+1}:verse.chapter<18?{chapter:verse.chapter+1,verse:1}:null;
  const link=(p:{chapter:number;verse:number})=>`/gita/verse/${p.chapter}/${p.verse}`;
