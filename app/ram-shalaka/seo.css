@@ -1,0 +1,9 @@
+/* Scoped educational SEO content below the existing interactive grid. */
+.shalaka-seo{max-width:960px;margin:38px auto 0;padding:30px 34px;background:#fffdfa;border:1px solid #e7d9c5;border-radius:20px;color:#16304b;line-height:1.85}
+.shalaka-seo h2{font:600 clamp(23px,3vw,32px)/1.35 var(--font-playfair),Georgia,serif;margin:15px 0 16px;color:#0b1f3b}
+.shalaka-seo p{font-size:14px;margin:12px 0;color:#46535c}
+.shalaka-seo-steps,.shalaka-seo-faq{margin-top:30px;padding-top:21px;border-top:1px solid #eddfcb}
+.shalaka-seo-steps ol{padding-left:25px;margin:0}.shalaka-seo-steps li{font-size:14px;padding-left:4px;margin:9px 0;color:#46535c}
+.shalaka-seo-faq details{border-bottom:1px solid #e8dac7;padding:12px 0}.shalaka-seo-faq summary{font-size:14px;font-weight:700;cursor:pointer;color:#17314d;list-style-position:outside}.shalaka-seo-faq details p{margin:9px 0 5px}
+.shalaka-seo-related a{color:#975f22;font-weight:750;text-decoration:underline;text-underline-offset:3px}
+@media(max-width:720px){.shalaka-seo{padding:22px 18px;margin-top:25px;border-radius:15px}.shalaka-seo h2{font-size:25px}}

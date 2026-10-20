@@ -23,7 +23,9 @@ import {
   traceSelection,
   type Language,
 } from './data';
+import ShalakaSeoContent from './seo-content';
 import './shalaka.css';
+import './seo.css';
 
 const ui = {
   en: {
@@ -594,6 +596,8 @@ UTTAR · getuttar.com/ram-shalaka`;
           <p className="shalaka-source-variance">
             {t.gridVariants}
           </p>
+
+          <ShalakaSeoContent lang={lang} />
 
           <div className="shalaka-explore">
             <Link href="/gita">

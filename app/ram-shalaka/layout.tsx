@@ -1,13 +1,53 @@
 import type { Metadata } from 'next';
 
+const site = 'https://getuttar.com';
+const title = 'Ram Shalaka Prashnavali Online | श्री राम शलाका';
+const description = 'Use Shri Ram Shalaka Prashnavali online: choose one of 225 aksharas yourself or let UTTAR select randomly. Read the traditional Ramcharitmanas chaupai, source and meaning in Hindi or English.';
+
 export const metadata: Metadata = {
-  title: 'Shri Ram Shalaka Prashnavali — Traditional Ramcharitmanas',
-  description: 'Explore the traditional 15×15 Shri Ram Shalaka Prashnavali from Ramcharitmanas. Select an akshara to read its chaupai, source context and reflection.',
+  title,
+  description,
   alternates: { canonical: '/ram-shalaka' },
-  openGraph: { title: 'Shri Ram Shalaka Prashnavali | UTTAR',
-    description: 'Experience the traditional Shri Ram Shalaka and explore its Ramcharitmanas chaupai.', url: '/ram-shalaka',
-    images: [{ url: '/rama.webp', alt: 'Shri Rama artwork — Ram Shalaka Prashnavali' }] },
-  twitter: { card: 'summary_large_image', title: 'Shri Ram Shalaka | UTTAR',
-    description: 'Traditional Ram Shalaka devotional reflection.', images: ['/rama.webp'] },
+  openGraph: {
+    type: 'website',
+    title: `${title} | UTTAR`,
+    description,
+    url: '/ram-shalaka',
+    images: [{ url: '/rama.webp', alt: 'Shri Rama artwork — UTTAR Ram Shalaka' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: `${title} | UTTAR`,
+    description,
+    images: ['/rama.webp'],
+  },
 };
-export default function RamShalakaLayout({ children }: Readonly<{ children: React.ReactNode }>) { return children; }
+
+export default function RamShalakaLayout({ children }: Readonly<{ children: React.ReactNode }>) {
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'WebPage',
+        '@id': `${site}/ram-shalaka#webpage`,
+        url: `${site}/ram-shalaka`,
+        name: 'Shri Ram Shalaka Prashnavali',
+        description,
+        inLanguage: ['en', 'hi'],
+        isPartOf: { '@id': `${site}/#website` },
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${site}/ram-shalaka#breadcrumbs`,
+        itemListElement: [
+          { '@type': 'ListItem', position: 1, name: 'UTTAR', item: site },
+          { '@type': 'ListItem', position: 2, name: 'Ram Shalaka Prashnavali', item: `${site}/ram-shalaka` },
+        ],
+      },
+    ],
+  };
+  return <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData).replace(/</g, '\\u003c') }} />
+    {children}
+  </>;
+}
