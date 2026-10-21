@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { verses } from '../../../lib/gita';
 import { findCandidateVerses, isHighStakes, MAX_QUESTION } from '../../../lib/gita-match';
 import { detectSafety, safetyResponse } from '../../../lib/gita-safety';
+import { getSpiritualSafetyContext } from '../../../lib/gita-spiritual-safety';
 import { interpretQuestion } from '../../../lib/gita-intent';
 import { mergeCandidates } from '../../../lib/gita-semantic';
 
@@ -77,7 +78,11 @@ export async function POST(req: Request) {
 
   // P0: Safety handling is independent of the model, retrieval, or an API key.
   const safety = detectSafety(question);
-  if (safety) return json(safetyResponse(safety, lang));
+  if (safety) {
+    const response = safetyResponse(safety, lang);
+    const spiritualContext = getSpiritualSafetyContext(question, safety, lang);
+    return json(spiritualContext ? { ...response, spiritualContext } : response);
+  }
 
   // V2 phase 1: interpret meaning BEFORE verse retrieval (original request stays intact).
   // The hard-coded safety gate above runs regardless of model/API availability.
@@ -91,7 +96,12 @@ export async function POST(req: Request) {
     try {
       const interpretation = await interpretQuestion(question, key, model);
       // A semantic warning cannot be silently downgraded into a Gita recommendation.
-      if (interpretation.safety !== 'none') return json(safetyResponse(interpretation.safety === 'danger' ? 'danger' : 'crisis', lang));
+      if (interpretation.safety !== 'none') {
+        const kind = interpretation.safety === 'danger' ? 'danger' : 'crisis';
+        const response = safetyResponse(kind, lang);
+        const spiritualContext = getSpiritualSafetyContext(question, interpretation.safety, lang);
+        return json(spiritualContext ? { ...response, spiritualContext } : response);
+      }
       searchText += ' ' + interpretation.searchText;
       suggestedRefs = interpretation.suggestedRefs;
     } catch {
