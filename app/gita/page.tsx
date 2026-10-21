@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {ArrowLeft,ArrowRight,BookOpen,Check,Copy,Heart,LockKeyhole,RefreshCw,Send,Shuffle,Sparkles} from 'lucide-react';
 import {verses,getVerse,type Language,type Verse} from '../../lib/gita';
+import { detectInputLanguage } from '../../lib/gita-language';
 import './ask.css';
 
 type Tab='heart'|'write';
@@ -18,8 +19,9 @@ function chooseIndex(length:number,exclude?:number){if(length<=1)return 0;const 
 export default function GitaPage(){
  const [lang,setLang]=useState<DisplayLanguage>('en');const [tab,setTab]=useState<Tab>('heart');const [selected,setSelected]=useState<Verse|null>(null);
  const [showReflection,setShowReflection]=useState(false);const [question,setQuestion]=useState('');const [reply,setReply]=useState<Response|null>(null);const [loading,setLoading]=useState(false);const [error,setError]=useState('');const [copied,setCopied]=useState(false);
- const t=words[lang==='hinglish'?'en':lang];
- const translationLang:Language=lang==='hi'?'hi':'en';
+ const autoLanguage = lang==='en' && tab==='write' ? detectInputLanguage(question) : lang;
+ const t=words[autoLanguage==='hinglish'?'en':autoLanguage];
+ const translationLang:Language=autoLanguage==='hi'?'hi':'en';
  const hinglish=lang==='hinglish';
  function switchTab(next:Tab){setTab(next);setSelected(null);setReply(null);setError('');setCopied(false);setShowReflection(false)}
  function reveal(){const old=selected?verses.findIndex(v=>v.chapter===selected.chapter&&v.verse===selected.verse):-1;setSelected(verses[chooseIndex(verses.length,old)]);setCopied(false);setError('')}
