@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { verses } from '../../../lib/gita';
 import { findCandidateVerses, isHighStakes, MAX_QUESTION } from '../../../lib/gita-match';
 import { detectSafety, safetyResponse } from '../../../lib/gita-safety';
+import { interpretQuestion } from '../../../lib/gita-intent';
+import { mergeCandidates } from '../../../lib/gita-semantic';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -77,7 +79,28 @@ export async function POST(req: Request) {
   const safety = detectSafety(question);
   if (safety) return json(safetyResponse(safety, lang));
 
-  const options = findCandidateVerses(getRomanHindiSearchText(question), verses, 32);
+  // V2 phase 1: interpret meaning BEFORE verse retrieval (original request stays intact).
+  // The hard-coded safety gate above runs regardless of model/API availability.
+  const key = process.env.OPENROUTER_API_KEY;
+  const model = process.env.OPENROUTER_MODEL || 'google/gemini-3-flash-preview';
+  // Release switch: keep legacy matching available without redeploying code.
+  const v2Enabled = process.env.UTTAR_INTELLIGENCE_V2 === 'true';
+  let suggestedRefs: string[] = [];
+  let searchText = getRomanHindiSearchText(question);
+  if (v2Enabled && key) {
+    try {
+      const interpretation = await interpretQuestion(question, key, model);
+      // A semantic warning cannot be silently downgraded into a Gita recommendation.
+      if (interpretation.safety !== 'none') return json(safetyResponse(interpretation.safety === 'danger' ? 'danger' : 'crisis', lang));
+      searchText += ' ' + interpretation.searchText;
+      suggestedRefs = interpretation.suggestedRefs;
+    } catch {
+      // Keep existing retrieval behavior if the provider is unavailable.
+      // Contextual risks detectable locally are always handled before this point.
+    }
+  }
+  const lexicalOptions = findCandidateVerses(searchText, verses, 32);
+  const options = v2Enabled ? mergeCandidates(lexicalOptions, suggestedRefs, verses, 32) : lexicalOptions;
   const sensitive = isHighStakes(question);
   if (!options.length) return json({ mode: 'no-match', sensitive, message: lang === 'hi'
     ? 'प्रश्न से स्पष्ट रूप से संबंधित श्लोक नहीं मिला। दूसरे शब्द आज़माएँ या अध्याय देखें।'
@@ -92,7 +115,6 @@ export async function POST(req: Request) {
       : lang === 'hinglish' ? 'Yeh topic/keyword based suggestion hai, personalized AI answer nahi.'
       : 'This is a topical/keyword suggestion, not a personalized AI answer.'
   };
-  const key = process.env.OPENROUTER_API_KEY;
   if (!key) return json({ ...fallback, note: lang === 'hi'
     ? 'OpenRouter API कुंजी उपलब्ध नहीं है; विषय/शब्द आधारित सुझाव दिखाया गया है।'
     : 'OpenRouter is not configured for this deployment; showing a topical/keyword suggestion.' });
@@ -103,7 +125,6 @@ export async function POST(req: Request) {
       sanskrit: o.verse.sanskrit,
       translation: o.verse.translation[sourceLang]
     }));
-    const model = process.env.OPENROUTER_MODEL || 'google/gemini-3-flash-preview';
     const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
