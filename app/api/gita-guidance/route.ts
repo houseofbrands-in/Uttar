@@ -97,9 +97,9 @@ export async function POST(req: Request) {
       const interpretation = await interpretQuestion(question, key, model);
       // A semantic warning cannot be silently downgraded into a Gita recommendation.
       if (interpretation.safety !== 'none') {
-        const kind = interpretation.safety === 'danger' ? 'danger' : 'crisis';
+        const kind = interpretation.safety === 'danger' ? 'danger' : interpretation.safety === 'harm_others' ? 'harm_others' : 'crisis';
         const response = safetyResponse(kind, lang);
-        const spiritualContext = getSpiritualSafetyContext(question, interpretation.safety, lang);
+        const spiritualContext = kind === 'harm_others' ? null : getSpiritualSafetyContext(question, interpretation.safety, lang);
         return json(spiritualContext ? { ...response, spiritualContext } : response);
       }
       searchText += ' ' + interpretation.searchText;
